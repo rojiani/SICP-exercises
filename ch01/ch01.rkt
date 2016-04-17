@@ -48,3 +48,28 @@
 (>= 9 9)
 (>= 9 5)
 (>= 6 9)
+
+; 1.1.7 Square Roots by Newton's Method
+; sqrt of N = 1/2 * ( N/G + G )
+; iteratively call until number basically not changing
+
+
+(define (improve guess x)
+	(* 0.5 (+ (/ x guess) guess)))
+
+(improve 15 169)
+
+(define (good-enough guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (sqrt-iter guess x)
+  (if (good-enough guess x)
+    guess
+    (sqrt-iter (improve guess x) x)))
+
+(sqrt-iter 15 169)
+
+(define (square-root x)
+  (sqrt-iter 1.0 x))
+
+(square-root 144)

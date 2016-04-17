@@ -31,12 +31,12 @@
 ; 1.3
 ; as "one procedure"
 (define (sos-larger-bad x y z)
-    (cond ((and (> x z) (> y z))
-            (+ (* x x) (* y y)))
-          ((and (> x y) (> z y))
-            (+ (* x x) (* z z)))
-          ((and (> y x) (> z x))
-            (+ (* y y) (* z z)))))
+  (cond ((and (> x z) (> y z))
+          (+ (* x x) (* y y)))
+        ((and (> x y) (> z y))
+          (+ (* x x) (* z z)))
+        ((and (> y x) (> z x))
+          (+ (* y y) (* z z)))))
 
 (sos-larger-bad 2 3 4) ; 25
 
@@ -47,12 +47,12 @@
     (+ (square x) (square y)))
 
 (define (sos-larger x y z)
-    (cond ((and (> x z) (> y z))
-            (sum-of-squares x y))
-          ((and (> x y) (> z y))
-            (sum-of-squares x z))
-          ((and (> y x) (> z x))
-            (sum-of-squares y z))))
+  (cond ((and (> x z) (> y z))
+          (sum-of-squares x y))
+        ((and (> x y) (> z y))
+          (sum-of-squares x z))
+        ((and (> y x) (> z x))
+          (sum-of-squares y z))))
 
 (sos-larger 1 2 3) ; 13
 
@@ -67,9 +67,9 @@
 (max 9 9)
 
 (define (sos-larger-2 x y z)
-    (sum-of-squares
-        (max x y)
-        (max (min x y) z)))
+  (sum-of-squares
+      (max x y)
+      (max (min x y) z)))
 
 (sos-larger-2 1 2 3) ; 13
 (sos-larger-2 3 5 4) ; 41
@@ -77,10 +77,56 @@
 
 ; 1.4
 (define (a-plus-abs-b a b)
-    ((if (> b 0) + -) a b))
+  ((if (> b 0) + -) a b))
 
 ; b > 0: (+ a b) = a + b
 ; b <= 0: (- a b) = a - b
+; operator can be result of an evaluation
 
 (a-plus-abs-b 7 4)
 (a-plus-abs-b 7 (- 4))
+
+; 1.5
+(define (p) (p))
+
+(define (test x y)
+  (if (= x 0)
+    0
+    y))
+
+;(test 0 (p))
+
+; applicative:
+; all parameters evaluated, p recursively calls itself
+; normal order:
+; parameters not evaluated until needed, and since x = 0, the recursive call
+; is never evaluated
+
+; 1.6
+(define (new-if predicate
+                then-clause
+                else-clause)
+  (cond (predicate then-clause)
+    (else else-clause)))
+
+(new-if (= 2 3) 0 5)
+(new-if (= 1 1) 0 5)
+
+(define (improve guess x)
+  (* 0.5 (+ (/ x guess) guess)))
+
+(define (good-enough guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (sqrt-iter guess x)
+  (new-if (good-enough guess x)
+    guess
+    (sqrt-iter (improve guess x) x)))
+
+(define (square-root x)
+  (sqrt-iter 1.0 x))
+
+; Will infinitely recurse, because the new-if doesn't have the special behavior
+; that only if the predicate is true, only one of the then/else clauses will
+; be evaluated (applicative evaluation). The else clause is recursively called
+; with same values (never halting execution).
