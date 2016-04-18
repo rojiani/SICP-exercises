@@ -53,7 +53,6 @@
 ; sqrt of N = 1/2 * ( N/G + G )
 ; iteratively call until number basically not changing
 
-
 (define (improve guess x)
 	(* 0.5 (+ (/ x guess) guess)))
 
@@ -72,4 +71,22 @@
 (define (square-root x)
   (sqrt-iter 1.0 x))
 
+; (square-root 9999999999998)       ; 3162277.660168063 (never returns)
+(square-root 1000000)
+(square-root 169)
 (square-root 144)
+(square-root 100)
+(square-root 64)
+(square-root 60) ; 7.746
+(square-root 9)
+(square-root 2)
+(square-root 1)
+(square-root (/ 1 9))
+(square-root 0.1)
+(square-root 0.01)
+(square-root 0.001)
+(square-root 0.0001)
+(square-root 0.00001)
+(square-root 0.000001)
+(square-root 0.0000001)
+(square-root 0.00000000001)

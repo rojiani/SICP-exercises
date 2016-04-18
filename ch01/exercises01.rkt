@@ -112,21 +112,98 @@
 (new-if (= 2 3) 0 5)
 (new-if (= 1 1) 0 5)
 
-(define (improve guess x)
-  (* 0.5 (+ (/ x guess) guess)))
 
-(define (good-enough guess x)
-  (< (abs (- (square guess) x)) 0.001))
 
-(define (sqrt-iter guess x)
-  (new-if (good-enough guess x)
-    guess
-    (sqrt-iter (improve guess x) x)))
+;(define (sqrt-iter guess x)
+;  (new-if (good-enough guess x)
+;    guess
+;    (sqrt-iter (improve guess x) x)))
 
-(define (square-root x)
-  (sqrt-iter 1.0 x))
+; (define (improve guess x)
+;   (* 0.5 (+ (/ x guess) guess)))
+
+; (define (good-enough guess x)
+;   (< (abs (- (square guess) x)) 0.001))
+
+;(define (square-root x)
+;  (sqrt-iter 1.0 x))
+
 
 ; Will infinitely recurse, because the new-if doesn't have the special behavior
 ; that only if the predicate is true, only one of the then/else clauses will
 ; be evaluated (applicative evaluation). The else clause is recursively called
 ; with same values (never halting execution).
+
+; 1.7
+(define (under-cutoff guess change)
+  (< (abs change) (/ guess 10000000)))
+
+(define (improved-guess guess radicand)
+   (* 0.5 (+ (/ radicand guess) guess)))
+
+(define (sqrt-iter guess radicand change)
+  (if (under-cutoff guess change)
+       guess
+       (sqrt-iter (improved-guess guess radicand)
+                  radicand
+                  (- guess (improved-guess guess radicand)))))
+
+(define (square-root n)
+  (sqrt-iter 1.0 n 1.0))
+
+; 1.7 tests
+(square-root 9999999999998)       ; 3162277.660168063
+(square-root 1000000)
+(square-root 169)
+(square-root 144)
+(square-root 100)
+(square-root 64)
+(square-root 60) ; 7.746
+(square-root 9)
+(square-root 2)
+(square-root 1)
+(square-root (/ 1 9))
+(square-root 0.1)
+(square-root 0.01)
+(square-root 0.001)
+(square-root 0.0001)
+(square-root 0.00001)
+(square-root 0.000001)
+(square-root 0.0000001)
+(square-root 0.00000000001)
+(newline)
+(newline)
+(newline)
+
+
+; 1.8: Newton's method for cube roots
+; cube root of x approx.: (x/y^3 + 2y)/3 where y is the guess
+
+(define (under-cutoff-2 guess change) ; handle negatives
+  (< (abs change) (/ (abs guess) 10000000)))
+
+(define (improved-cube-guess x y)
+   (* (/ 1 3)
+      (+ (/ x (square y))
+         (* 2 y))))
+
+(define (cubic-root-iter x guess change)
+  (if (under-cutoff-2 guess change)
+      guess
+      (cubic-root-iter x
+                       (improved-cube-guess x guess)
+                       (- guess (improved-cube-guess x guess)))))
+
+(define (cubic-root x)
+  (cubic-root-iter x 1.0 1.0))
+
+(cubic-root 8)
+(cubic-root (- 8))
+(cubic-root 125)
+(cubic-root (- 125))
+(cubic-root 997002999)          ; 999
+(cubic-root 1000030000300001)   ; 100001
+(cubic-root 0.125)              ; 0.5
+(cubic-root 0.015625)           ; 0.25
+(cubic-root (/ 1 50653))        ; 1/37 = 0.02702702702702703
+(cubic-root (- (/ 1 50653)))    ; -(1/37) = -0.02702702702702703
