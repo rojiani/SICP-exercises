@@ -90,3 +90,19 @@
 (square-root 0.000001)
 (square-root 0.0000001)
 (square-root 0.00000000001)
+
+; p. 90
+(define (sqrt x)
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (average a b) (/ (+ a b) 2))
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess)
+    (if (good-enough? guess)
+        guess
+        (sqrt-iter (improve guess))))
+  (sqrt-iter 1.0))
+
+(newline)
+(sqrt 144)
